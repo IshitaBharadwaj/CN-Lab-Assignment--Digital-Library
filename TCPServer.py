@@ -30,7 +30,6 @@ def disp_user(srn,name):
     flag=0
     data = json.load(f)
     for i in data['users']:
-        #print(i['srn'],srn,type(i['srn']) ,type(srn))
         if i['srn']==srn:
             f.close()
             flag=1
@@ -52,7 +51,6 @@ def send_books(flag,obj):
         f = open('data.json')
         data = json.load(f)
         obj=json.loads(obj)
-        #print("obj:  ",obj,type(obj))
         for i in data['users']:
 
             if i['srn'] == obj['srn']:
@@ -71,7 +69,6 @@ def borrow_user(uids,obj):
     f = open('data.json')
     data = json.load(f)
     obj=json.loads(obj)
-    #print("obj:  ",obj,type(obj))
     for i in data['books']:
         for j in uids:
             if i['uid'] == j:
@@ -92,7 +89,6 @@ def borrow_user(uids,obj):
 
                 for x in uids:
                     item['borrows'].append(x)
-                #print("borrowed list ",item['borrows'])
                 temp=item['credits']
     
         file.seek(0)
@@ -112,7 +108,6 @@ def return_user(uids,obj):
             if item['srn'] == obj['srn']:
                 for x in uids:
                     item['borrows'].remove(x)
-                #print("remaining borrowed books list ",item['borrows'])
                 temp=item['borrows']        
         file.seek(0)
         file.close()
@@ -129,7 +124,6 @@ def return_user(uids,obj):
             for j in temp:
                 if i['uid'] == j:
                     book_names.append(i['title'])
-    #print(book_names)
     f.close()                
     return book_names
                     
@@ -162,12 +156,10 @@ def check_valid_uid(obj,uids):
     for i in data['users']:
         if i['srn']==obj['srn']:
             for j in uids:
-                #flag=1
                 if j in i['borrows']:
                     pass
                 else:     
                     flag=0
-                    #("flaggg!!! ",flag,end=" ")
                     f.close()
                     return flag  
 
@@ -186,7 +178,6 @@ while True:
     ack = "positive"
     nak="negative"
     obj= json.dumps(disp_user(srn,name))
-    #print("obj:   ",obj,type(obj))
     if obj!="[]":
         connectionSocket.send(ack.encode())
         ack=connectionSocket.recv(1024).decode()
@@ -205,11 +196,8 @@ while True:
     else:
        return_books = json.dumps(send_books(1,obj))
        connectionSocket.send(return_books.encode())     
-    # choice=connectionSocket.recv(1024).decode()
     uid = connectionSocket.recv(1024).decode()
-    #print(type(uid),uid)
     uids=json.loads(uid)
-    #print(type(uids),uids)
     if choice == "borrow":
         c = borrow_user(uids,obj)
         if(type(c) == type("nak")):
@@ -220,7 +208,6 @@ while True:
     else:
         flag = check_valid_uid(obj,uids)
         
-        #print("flag value: ",flag)
         if flag ==1:
             remaining_books = json.dumps(return_user(uids,obj))
             connectionSocket.send(remaining_books.encode())
